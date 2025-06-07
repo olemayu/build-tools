@@ -1,6 +1,5 @@
 INFO_NAME    := $(shell sed -n '1p' configs/info)
-INFO_PREFIX  := $(shell sed -n '2p' configs/info)
-INFO_VER     := $(shell sed -n '3p' configs/info)
+INFO_VER     := $(shell sed -n '2p' configs/info)
 INFO_HASH    := $(shell git rev-parse --short HEAD)
 PWD          := $(shell pwd)
 
@@ -74,11 +73,11 @@ SOURCE          := $(SOURCE_COMMON) $(filter %.$(make_target).c,$(SOURCE_PLATFOR
 
 MAIN_CFLAGS         := -Isource \
                        -Iinclude \
-                       -D$(INFO_PREFIX)_NAME=\"$(INFO_NAME)\" \
-                       -D$(INFO_PREFIX)_HASH=\"$(INFO_HASH)\" \
-                       -D$(INFO_PREFIX)_TARGET=$(make_target) \
-                       -D$(INFO_PREFIX)_CONFIG=$(make_config) \
-                       -D$(INFO_PREFIX)_VERSION=$(INFO_VER) \
+                       -DVGS_NAME=\"$(INFO_NAME)\" \
+                       -DVGS_HASH=\"$(INFO_HASH)\" \
+                       -DVGS_TARGET=$(make_target) \
+                       -DVGS_CONFIG=$(make_config) \
+                       -DVGS_VERSION=$(INFO_VER) \
                        "-fdebug-prefix-map=$(PWD)=" \
                        -std=gnu2y \
                        -O3 \
@@ -105,16 +104,16 @@ MAIN_LDFLAGS        := -lm \
                        -fuse-ld=lld
 CFLAGS_DEVELOPMENT  := -gdwarf-4 \
                        -fno-omit-frame-pointer \
-                       -D$(INFO_PREFIX)_DEVELOPMENT=1 \
-                       -D$(INFO_PREFIX)_RELEASE=0
+                       -DVGS_DEVELOPMENT=1 \
+                       -DVGS_RELEASE=0
 LDFLAGS_DEVELOPMENT := -fno-omit-frame-pointer
 
 CFLAGS_RELEASE      := -ffast-math \
                        -fdata-sections \
                        -ffunction-sections \
                        -DNDEBUG=1 \
-                       -D$(INFO_PREFIX)_DEVELOPMENT=0 \
-                       -D$(INFO_PREFIX)_RELEASE=1
+                       -DVGS_DEVELOPMENT=0 \
+                       -DVGS_RELEASE=1
 LDFLAGS_RELEASE     := -Wl,--gc-sections
 
 # These will not be written into .clangd config
@@ -128,7 +127,7 @@ DLL_WIN32           := dll
 CC_WIN32            := x86_64-w64-mingw32.static-clang
 CXX_WIN32           := x86_64-w64-mingw32.static-clang++
 PKGCONFIG_WIN32     := x86_64-w64-mingw32.static-pkg-config
-CFLAGS_WIN32        := -D$(INFO_PREFIX)_LINUX=0 -D$(INFO_PREFIX)_WIN32=1 -D$(INFO_PREFIX)_TRACE_SKIP=4
+CFLAGS_WIN32        := -DVGS_LINUX=0 -DVGS_WIN32=1 -DVGS_TRACE_SKIP=4
 LDFLAGS_WIN32       := -Wl,-stack=0x800000
 
 EXE_LINUX           := elf
@@ -136,7 +135,7 @@ DLL_LINUX           := so
 CC_LINUX            := clang
 CXX_LINUX           := clang++
 PKGCONFIG_LINUX     := pkg-config
-CFLAGS_LINUX        := -D$(INFO_PREFIX)_LINUX=1 -D$(INFO_PREFIX)_WIN32=0 -D$(INFO_PREFIX)_TRACE_SKIP=3
+CFLAGS_LINUX        := -DVGS_LINUX=1 -DVGS_WIN32=0 -DVGS_TRACE_SKIP=3
 LDFLAGS_LINUX       := -Wl,-z,stack-size=0x800000
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -158,10 +157,10 @@ LDFLAGS += -fsanitize=address
 endif
 endif
 
-$(BINARY_PATH)/static/%.o:            CFLAGS += -D$(INFO_PREFIX)_STATIC=1 -D$(INFO_PREFIX)_SHARED=0
-$(BINARY_PATH)/shared/%.o:            CFLAGS += -D$(INFO_PREFIX)_STATIC=0 -D$(INFO_PREFIX)_SHARED=1 -fPIC
-$(BINARY_PATH)/persistent-static/%.o: CFLAGS += -D$(INFO_PREFIX)_STATIC=1 -D$(INFO_PREFIX)_SHARED=0
-$(BINARY_PATH)/persistent-shared/%.o: CFLAGS += -D$(INFO_PREFIX)_STATIC=0 -D$(INFO_PREFIX)_SHARED=1 -fPIC
+$(BINARY_PATH)/static/%.o:            CFLAGS += -DVGS_STATIC=1 -DVGS_SHARED=0
+$(BINARY_PATH)/shared/%.o:            CFLAGS += -DVGS_STATIC=0 -DVGS_SHARED=1 -fPIC
+$(BINARY_PATH)/persistent-static/%.o: CFLAGS += -DVGS_STATIC=1 -DVGS_SHARED=0
+$(BINARY_PATH)/persistent-shared/%.o: CFLAGS += -DVGS_STATIC=0 -DVGS_SHARED=1 -fPIC
 
 -include configs/override.mk
 -include configs/override.$(make_target).mk
