@@ -198,3 +198,9 @@ $(call FN_BUILD_OBJ_RECIPE,persistent-static)
 	$(FN_COMPILE_CC)
 $(call FN_BUILD_OBJ_RECIPE,persistent-shared)
 	$(FN_COMPILE_CC)
+%.vert.spirv: %.vert.glsl
+	@$(call FN_PRINT,235,120,20,glsl)
+	@glslc -fshader-stage=vert -O $< -o $@
+%.frag.spirv: %.frag.glsl
+	@$(call FN_PRINT,235,120,20,glsl)
+	@glslc -fshader-stage=frag -O $< -o $@

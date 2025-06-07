@@ -43,7 +43,7 @@ if (not os.path.exists(".clangd") or
 			 "  Add: [\n"
 			 "    -xc,\n"
 			 "    -ferror-limit=80,\n"
-			 "    -DNRG_IDE=true,\n"
+			 "    -D__clangd_ide__=true,\n"
 			f"    -I{os.getcwd()}/include,\n"
 			f"    -I{os.getcwd()}/source,\n"
 			f"    {",\n    ".join(f'"{f.replace('"', '\\"')}"' for f in linux_cflags)}\n"
